@@ -1,9 +1,15 @@
-package stack
+package stack_test
 
 import (
+	algo "github.com/16go/algopack"
+	"github.com/16go/algopack/linear/stack"
 	"sync"
 	"testing"
 )
+
+var _ algo.ConcurrentSafeInterface = stack.NewStack[int]()
+var _ algo.CollectionInterface = stack.NewStack[int]()
+var _ algo.StackInterface[int] = stack.NewStack[int]()
 
 func NewIfaceStack() *ifaceStack {
 	return new(ifaceStack)
@@ -34,7 +40,7 @@ type el struct {
 }
 
 func TestStack_Pop(t *testing.T) {
-	s := NewStack[el]()
+	s := stack.NewStack[el]()
 	s.Push(el{1})
 	s.Push(el{2})
 	s.Push(el{3})
@@ -54,7 +60,7 @@ func Benchmark_InterfaceStack_Push(b *testing.B) {
 }
 
 func Benchmark_GenericStack_Push(b *testing.B) {
-	gs := NewStack[el]()
+	gs := stack.NewStack[el]()
 	for i := 0; i < b.N; i++ {
 		gs.Push(el{i})
 	}
