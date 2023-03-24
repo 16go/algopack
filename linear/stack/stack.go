@@ -6,12 +6,14 @@ import (
 )
 
 func NewStack[T any]() *stack[T] {
-	return new(stack[T])
+	s := new(stack[T])
+	s.top = -1
+	return s
 }
 
 // NewSafeStack creates a concurrent-safe stack.
 func NewSafeStack[T any]() *stack[T] {
-	s := new(stack[T])
+	s := NewStack[T]()
 	s.safe = true
 	return s
 }
@@ -36,7 +38,7 @@ func (s *stack[T]) Push(el T) {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 	}
-	if s.top == len(s.items) {
+	if s.top == len(s.items)-1 {
 		s.items = append(s.items, el)
 	} else {
 		s.items[s.top] = el
@@ -52,7 +54,7 @@ func (s *stack[T]) Pop() T {
 	if s.IsEmpty() {
 		return utils.Zero[T]()
 	}
-	el := s.items[s.top-1]
+	el := s.items[s.top]
 	s.top--
 	return el
 }
@@ -72,10 +74,10 @@ func (s *stack[T]) Peek() T {
 
 // IsEmpty returns TRUE if the stack does not have elements.
 func (s *stack[T]) IsEmpty() bool {
-	return len(s.items) == 0
+	return s.top == -1
 }
 
 // Size returns the number of elements in the stack.
 func (s *stack[T]) Size() int {
-	return len(s.items)
+	return s.top + 1
 }
